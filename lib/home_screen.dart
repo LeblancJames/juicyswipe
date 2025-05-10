@@ -15,15 +15,24 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFFFF5D9),
       body: Stack(
         children: [
+          Image.asset(
+            'assets/background.png',
+            width: double.infinity,
+            height: double.infinity,
+            fit: BoxFit.cover,
+          ),
+          Container(
+            color: const Color.fromRGBO(0, 0, 0, 0.2), // 50% transparent black
+          ),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: 84),
+                SizedBox(height: screenHeight * 0.15),
                 Text(
                   'JUICY',
                   style: GoogleFonts.luckiestGuy(
-                    fontSize: 88,
+                    fontSize: screenHeight * .12,
                     color: Colors.brown,
                     height: 1,
                   ),
@@ -31,20 +40,27 @@ class HomeScreen extends StatelessWidget {
                 Text(
                   'SWIPE',
                   style: GoogleFonts.luckiestGuy(
-                    fontSize: 88,
+                    fontSize: screenHeight * .12,
                     color: Colors.brown,
                     height: 1,
                   ),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: screenHeight * 0.05),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const GameScreen(),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF4A259), // light orange
                     foregroundColor: Colors.white, // text color
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: 0,
-                      vertical: 24,
+                      vertical: screenHeight * 0.025,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -57,24 +73,37 @@ class HomeScreen extends StatelessWidget {
                     height: screenHeight * 0.08,
                     child: Center(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: EdgeInsets.only(
+                          left: screenWidth * 0.075,
+                          right: screenWidth * 0.075,
+                          bottom: screenHeight * 0.01,
+                        ),
                         child: Text(
                           'PLAY',
-                          style: GoogleFonts.luckiestGuy(fontSize: 52),
+                          style: GoogleFonts.luckiestGuy(
+                            fontSize: screenHeight * 0.075,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: screenHeight * 0.05),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LeaderboardScreen(),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF4A259), // light orange
                     foregroundColor: Colors.white, // text color
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: 0,
-                      vertical: 24,
+                      vertical: screenHeight * 0.025,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -83,14 +112,19 @@ class HomeScreen extends StatelessWidget {
                     shadowColor: Colors.brown,
                   ),
                   child: SizedBox(
-                    width: screenWidth * 0.4,
-                    height: screenHeight * 0.04,
+                    width: screenWidth * 0.45,
+                    height: screenHeight * 0.030,
                     child: Center(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: EdgeInsets.only(
+                          left: screenWidth * 0.05,
+                          right: screenWidth * 0.05,
+                        ),
                         child: Text(
                           'LEADERBOARD',
-                          style: GoogleFonts.luckiestGuy(fontSize: 24),
+                          style: GoogleFonts.luckiestGuy(
+                            fontSize: screenWidth * 0.05,
+                          ),
                         ),
                       ),
                     ),
@@ -102,16 +136,21 @@ class HomeScreen extends StatelessWidget {
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 48),
+              padding: EdgeInsets.symmetric(
+                vertical: screenHeight * .02,
+                horizontal: screenWidth * .05,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Settings
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      //TODO: Implement settings functionality
+                    },
                     child: Container(
-                      width: 68,
-                      height: 68,
+                      width: screenWidth * 0.15,
+                      height: screenWidth * 0.15,
                       decoration: BoxDecoration(
                         color: Color(0xFFF4A259),
                         shape: BoxShape.circle,
@@ -126,16 +165,23 @@ class HomeScreen extends StatelessWidget {
                       child: Icon(
                         Icons.settings,
                         color: Colors.white,
-                        size: 36,
+                        size: screenWidth * 0.1,
                       ),
                     ),
                   ),
                   // Help
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HowToPlayScreen(),
+                        ),
+                      );
+                    },
                     child: Container(
-                      width: 68,
-                      height: 68,
+                      width: screenWidth * 0.15,
+                      height: screenWidth * 0.15,
                       decoration: BoxDecoration(
                         color: Color(0xFFF4A259),
                         shape: BoxShape.circle,
@@ -150,8 +196,8 @@ class HomeScreen extends StatelessWidget {
                       child: Center(
                         child: Image.asset(
                           'assets/help_icon.png',
-                          width: 36,
-                          height: 36,
+                          width: screenWidth * 0.1,
+                          height: screenWidth * 0.1,
                           fit: BoxFit.contain,
                         ),
                       ),
