@@ -76,12 +76,11 @@ class HomeScreen extends StatelessWidget {
                         padding: EdgeInsets.only(
                           left: screenWidth * 0.075,
                           right: screenWidth * 0.075,
-                          bottom: screenHeight * 0.01,
                         ),
                         child: Text(
                           'PLAY',
                           style: GoogleFonts.luckiestGuy(
-                            fontSize: screenHeight * 0.075,
+                            fontSize: screenHeight * 0.07,
                           ),
                         ),
                       ),
