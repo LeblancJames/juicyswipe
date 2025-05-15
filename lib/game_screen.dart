@@ -1,5 +1,9 @@
+import 'dart:math';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:juicyswipe/models/fruit.dart';
 import 'package:juicyswipe/widgets/heart_capsule.dart';
 
 class GameScreen extends StatefulWidget {
@@ -12,6 +16,14 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   late double screenWidth;
   late double screenHeight;
+  List<FallingFruit> fruits = [];
+  late Timer fruitSpawner;
+  final Random rng = Random();
+  final List<double> columnPositions = [
+    -0.7,
+    0.0,
+    0.7,
+  ]; // Left, center, right, which columns to spawn fruits in
 
   final List<String> baseBaskets = [
     'blueBasket',
@@ -20,12 +32,69 @@ class _GameScreenState extends State<GameScreen> {
     'yellowBasket',
     'empty',
   ];
+  final List<String> fruitTypes = [
+    'apple',
+    'banana',
+    'watermelon',
+    'blueberry',
+  ]; // image names in assets
+  final double fruitSize = 60.0;
 
   int currentCenterIndex = 0;
 
   int getWrappedIndex(int index) {
     final length = baseBaskets.length;
     return (index % length + length) % length;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    startSpawningFruits();
+  }
+
+  void startSpawningFruits() {
+    fruitSpawner = Timer.periodic(Duration(seconds: 2), (_) {
+      final newFruit = FallingFruit(
+        type:
+            fruitTypes[rng.nextInt(
+              fruitTypes.length,
+            )], //pick a random fruit type from the list
+        xPosition: columnPositions[rng.nextInt(columnPositions.length)],
+        yPosition: 0,
+      );
+
+      setState(() {
+        fruits.add(newFruit);
+      });
+
+      animateFruit(newFruit);
+    });
+  }
+
+  void animateFruit(FallingFruit fruit) async {
+    while (fruit.yPosition < 1.0) {
+      await Future.delayed(Duration(milliseconds: 16));
+      setState(() {
+        fruit.yPosition += 0.01;
+      });
+    }
+
+    handleMissedFruit(fruit);
+  }
+
+  void handleMissedFruit(FallingFruit fruit) {
+    setState(() {
+      fruits.removeWhere((f) => f.key == fruit.key);
+    });
+
+    // TODO: deduct a life or show missed animation
+  }
+
+  @override
+  void dispose() {
+    fruitSpawner.cancel();
+    super.dispose();
   }
 
   Widget _buildBasket(int index) {
@@ -123,6 +192,18 @@ class _GameScreenState extends State<GameScreen> {
                   _buildBasket(currentCenterIndex),
                   _buildBasket(getWrappedIndex(currentCenterIndex + 1)),
                 ],
+              ),
+            ),
+            ...fruits.map(
+              (fruit) => Positioned(
+                key: fruit.key,
+                top: screenHeight * fruit.yPosition,
+                left: (screenWidth / 2) * (fruit.xPosition + 1) - fruitSize / 2,
+                child: Image.asset(
+                  'assets/${fruit.type}.png',
+                  width: fruitSize,
+                  height: fruitSize,
+                ),
               ),
             ),
           ],
