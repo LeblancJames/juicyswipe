@@ -28,9 +28,9 @@ class _GameScreenState extends State<GameScreen> {
   final List<String> baseBaskets = [
     'blueBasket',
     'redBasket',
+    'empty',
     'greenBasket',
     'yellowBasket',
-    'empty',
   ];
   final List<String> fruitTypes = [
     'apple',
@@ -38,10 +38,18 @@ class _GameScreenState extends State<GameScreen> {
     'watermelon',
     'blueberry',
   ]; // image names in assets
+  final Map<String, String> fruitColorMap = {
+    'apple': 'red',
+    'banana': 'yellow',
+    'watermelon': 'green',
+    'blueberry': 'blue',
+  };
+
   final double fruitSize = 60.0;
 
   int currentCenterIndex = 0;
 
+  //wrap around the index
   int getWrappedIndex(int index) {
     final length = baseBaskets.length;
     return (index % length + length) % length;
@@ -55,12 +63,21 @@ class _GameScreenState extends State<GameScreen> {
 
   void startSpawningFruits() {
     fruitSpawner = Timer.periodic(Duration(seconds: 2), (_) {
+      final fruitType =
+          fruitTypes[rng.nextInt(
+            fruitTypes.length,
+          )]; //pick a random fruit type from the list
+
+      final fruitColor = fruitColorMap[fruitType]!;
+
       final newFruit = FallingFruit(
-        type:
-            fruitTypes[rng.nextInt(
-              fruitTypes.length,
-            )], //pick a random fruit type from the list
-        xPosition: columnPositions[rng.nextInt(columnPositions.length)],
+        type: fruitType,
+        color: fruitColor,
+
+        xPosition:
+            columnPositions[rng.nextInt(
+              columnPositions.length,
+            )], //pcik a random column position
         yPosition: 0,
       );
 
@@ -80,10 +97,36 @@ class _GameScreenState extends State<GameScreen> {
       });
     }
 
-    handleMissedFruit(fruit);
+    handleFruitLanding(fruit);
   }
 
-  void handleMissedFruit(FallingFruit fruit) {
+  List<String> get visibleBaskets => [
+    baseBaskets[getWrappedIndex(currentCenterIndex - 1)],
+    baseBaskets[getWrappedIndex(currentCenterIndex)],
+    baseBaskets[getWrappedIndex(currentCenterIndex + 1)],
+  ];
+
+  void handleFruitLanding(FallingFruit fruit) {
+    print(visibleBaskets);
+
+    int columnIndex = columnPositions.indexOf(fruit.xPosition);
+    String basketColor = visibleBaskets[columnIndex].replaceAll('Basket', '');
+
+    if (fruit.color == basketColor) {
+      // Correct catch
+      setState(() {
+        print(
+          'Correct catch! ${fruit.color} fruit caught in $basketColor basket',
+        );
+      });
+    } else {
+      // Missed or wrong basket
+      setState(() {
+        print(
+          'Missed or wrong basket ${fruit.color} fruit caught in $basketColor!',
+        );
+      });
+    }
     setState(() {
       fruits.removeWhere((f) => f.key == fruit.key);
     });
