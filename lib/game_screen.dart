@@ -115,16 +115,16 @@ class _GameScreenState extends State<GameScreen> {
     if (fruit.color == basketColor) {
       // Correct catch
       setState(() {
-        print(
-          'Correct catch! ${fruit.color} fruit caught in $basketColor basket',
-        );
+        score += 1;
       });
     } else {
       // Missed or wrong basket
       setState(() {
-        print(
-          'Missed or wrong basket ${fruit.color} fruit caught in $basketColor!',
-        );
+        lives -= 1;
+        if (lives <= 0) {
+          isGameOver = true;
+          fruitSpawner.cancel(); // stop spawning more
+        }
       });
     }
     setState(() {
@@ -159,6 +159,10 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  int score = 0;
+  int lives = 3;
+  bool isGameOver = false;
+
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
@@ -192,7 +196,7 @@ class _GameScreenState extends State<GameScreen> {
               left: screenWidth * 0.025,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [HeartCapsule(lives: 3)],
+                children: [HeartCapsule(lives: lives)],
               ),
             ),
 
@@ -213,7 +217,7 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                   ),
                   Text(
-                    '1110',
+                    score.toString(),
                     style: GoogleFonts.luckiestGuy(
                       fontSize: screenWidth * 0.06,
                       color: Colors.black,
