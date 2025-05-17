@@ -3,9 +3,32 @@ import 'package:juicyswipe/how_to_play.dart';
 import 'game_screen.dart';
 import 'leaderboard_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:audioplayers/audioplayers.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late AudioPlayer music;
+
+  @override
+  void initState() {
+    super.initState();
+    music = AudioPlayer();
+    music.setReleaseMode(ReleaseMode.loop);
+    music.setSource(AssetSource('music.mp3'));
+    music.play(AssetSource('music.mp3'));
+  }
+
+  @override
+  void dispose() {
+    music.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

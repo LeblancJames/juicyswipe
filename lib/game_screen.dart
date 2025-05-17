@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:juicyswipe/game_over_screen.dart';
@@ -137,8 +138,6 @@ class _GameScreenState extends State<GameScreen> {
         });
       });
     }
-
-    // TODO: deduct a life or show missed animation
   }
 
   @override
@@ -166,6 +165,7 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  //collision info
   int score = 0;
   int lives = 3;
   bool isGameOver = false;
@@ -180,10 +180,15 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   final double collisionHeight = 0.75;
+  bool hasNavigatedToGameOver = false;
+
+  //sound
+  final AudioPlayer sfxPlayer = AudioPlayer();
 
   @override
   Widget build(BuildContext context) {
-    if (isGameOver) {
+    if (isGameOver && !hasNavigatedToGameOver) {
+      hasNavigatedToGameOver = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
@@ -280,10 +285,7 @@ class _GameScreenState extends State<GameScreen> {
                       fruit.isMissed
                           ? Tween<Offset>(
                             begin: Offset.zero,
-                            end: Offset(
-                              screenWidth * 0.5,
-                              -screenHeight * 0.2,
-                            ), // ⬅️ soft bounce up-right
+                            end: Offset(screenWidth * 0.5, -screenHeight * 0.2),
                           )
                           : ConstantTween(Offset.zero),
                   duration: Duration(milliseconds: 600),
