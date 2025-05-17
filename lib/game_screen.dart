@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:juicyswipe/game_over_screen.dart';
 import 'package:juicyswipe/models/fruit.dart';
 import 'package:juicyswipe/widgets/heart_capsule.dart';
 
@@ -58,7 +59,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
-    startSpawningFruits();
+    resetGame();
   }
 
   void startSpawningFruits() {
@@ -90,14 +91,18 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void animateFruit(FallingFruit fruit) async {
-    while (fruit.yPosition < 1.0) {
+    while (fruit.yPosition < collisionHeight &&
+        !fruit.isCaught &&
+        !isGameOver) {
       await Future.delayed(Duration(milliseconds: 16));
       setState(() {
         fruit.yPosition += 0.01;
       });
     }
 
-    handleFruitLanding(fruit);
+    if (!fruit.isCaught && !isGameOver) {
+      handleFruitLanding(fruit);
+    }
   }
 
   List<String> get visibleBaskets => [
@@ -107,29 +112,31 @@ class _GameScreenState extends State<GameScreen> {
   ];
 
   void handleFruitLanding(FallingFruit fruit) {
-    print(visibleBaskets);
-
     int columnIndex = columnPositions.indexOf(fruit.xPosition);
     String basketColor = visibleBaskets[columnIndex].replaceAll('Basket', '');
 
     if (fruit.color == basketColor) {
       // Correct catch
       setState(() {
+        fruit.isCaught = true;
         score += 1;
       });
     } else {
       // Missed or wrong basket
       setState(() {
         lives -= 1;
+        fruit.isMissed = true;
         if (lives <= 0) {
           isGameOver = true;
           fruitSpawner.cancel(); // stop spawning more
         }
       });
+      Future.delayed(Duration(milliseconds: 300), () {
+        setState(() {
+          fruits.removeWhere((f) => f.key == fruit.key);
+        });
+      });
     }
-    setState(() {
-      fruits.removeWhere((f) => f.key == fruit.key);
-    });
 
     // TODO: deduct a life or show missed animation
   }
@@ -162,9 +169,29 @@ class _GameScreenState extends State<GameScreen> {
   int score = 0;
   int lives = 3;
   bool isGameOver = false;
+  void resetGame() {
+    setState(() {
+      score = 0;
+      lives = 3;
+      isGameOver = false;
+      fruits.clear();
+      startSpawningFruits();
+    });
+  }
+
+  final double collisionHeight = 0.75;
 
   @override
   Widget build(BuildContext context) {
+    if (isGameOver) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => GameOverScreen(score: score)),
+        );
+      });
+    }
+
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
 
@@ -243,13 +270,63 @@ class _GameScreenState extends State<GameScreen> {
             ),
             ...fruits.map(
               (fruit) => Positioned(
-                key: fruit.key,
+                key: ValueKey(
+                  '${fruit.key}-${fruit.isCaught}-${fruit.isMissed}',
+                ),
                 top: screenHeight * fruit.yPosition,
                 left: (screenWidth / 2) * (fruit.xPosition + 1) - fruitSize / 2,
-                child: Image.asset(
-                  'assets/${fruit.type}.png',
-                  width: fruitSize,
-                  height: fruitSize,
+                child: TweenAnimationBuilder<Offset>(
+                  tween:
+                      fruit.isMissed
+                          ? Tween<Offset>(
+                            begin: Offset.zero,
+                            end: Offset(
+                              screenWidth * 0.5,
+                              -screenHeight * 0.2,
+                            ), // ⬅️ soft bounce up-right
+                          )
+                          : ConstantTween(Offset.zero),
+                  duration: Duration(milliseconds: 600),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, offset, child) {
+                    return Transform.translate(offset: offset, child: child);
+                  },
+                  child: TweenAnimationBuilder<double>(
+                    tween:
+                        fruit.isMissed
+                            ? Tween<double>(begin: 1.0, end: 0.0)
+                            : ConstantTween(1.0),
+                    duration: Duration(milliseconds: 600),
+                    builder: (context, opacity, child) {
+                      return Opacity(
+                        opacity: opacity,
+                        child: TweenAnimationBuilder<double>(
+                          tween:
+                              fruit.isCaught
+                                  ? Tween<double>(begin: 1.0, end: 0.0)
+                                  : ConstantTween<double>(1.0),
+                          duration: const Duration(milliseconds: 300),
+                          builder: (context, value, child) {
+                            double scaleY =
+                                value > 0.7 ? 1.0 - (1.0 - value) * 2.5 : value;
+                            double scaleX =
+                                value < 1.0 ? 1.0 + (1.0 - value) * 0.3 : 1.0;
+
+                            return Transform.scale(
+                              scaleY: scaleY.clamp(0.0, 1.0),
+                              scaleX: scaleX.clamp(0.0, 1.3),
+                              child: child,
+                            );
+                          },
+                          child: Image.asset(
+                            'assets/${fruit.type}.png',
+                            width: fruitSize,
+                            height: fruitSize,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),

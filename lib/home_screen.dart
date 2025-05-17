@@ -32,7 +32,7 @@ class HomeScreen extends StatelessWidget {
                 Text(
                   'JUICY',
                   style: GoogleFonts.luckiestGuy(
-                    fontSize: screenHeight * .12,
+                    fontSize: screenWidth * .26,
                     color: Colors.brown,
                     height: 1,
                   ),
@@ -40,7 +40,7 @@ class HomeScreen extends StatelessWidget {
                 Text(
                   'SWIPE',
                   style: GoogleFonts.luckiestGuy(
-                    fontSize: screenHeight * .12,
+                    fontSize: screenWidth * .26,
                     color: Colors.brown,
                     height: 1,
                   ),
@@ -56,21 +56,31 @@ class HomeScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF4A259), // light orange
-                    foregroundColor: Colors.white, // text color
+                    backgroundColor: const Color.fromARGB(
+                      220,
+                      244,
+                      161,
+                      89,
+                    ), // light orange
+                    foregroundColor: const Color.fromARGB(
+                      223,
+                      255,
+                      255,
+                      255,
+                    ), // text color
                     padding: EdgeInsets.symmetric(
                       horizontal: 0,
-                      vertical: screenHeight * 0.025,
+                      vertical: screenWidth * 0.055,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(48),
                     ),
                     elevation: 4,
                     shadowColor: Colors.brown,
                   ),
                   child: SizedBox(
                     width: screenWidth * 0.6,
-                    height: screenHeight * 0.08,
+                    height: screenWidth * 0.16,
                     child: Center(
                       child: Padding(
                         padding: EdgeInsets.only(
@@ -80,7 +90,7 @@ class HomeScreen extends StatelessWidget {
                         child: Text(
                           'PLAY',
                           style: GoogleFonts.luckiestGuy(
-                            fontSize: screenHeight * 0.07,
+                            fontSize: screenWidth * 0.15,
                           ),
                         ),
                       ),
@@ -98,21 +108,31 @@ class HomeScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF4A259), // light orange
-                    foregroundColor: Colors.white, // text color
+                    backgroundColor: const Color.fromARGB(
+                      228,
+                      244,
+                      161,
+                      89,
+                    ), // light orange
+                    foregroundColor: const Color.fromARGB(
+                      204,
+                      255,
+                      255,
+                      255,
+                    ), // text color
                     padding: EdgeInsets.symmetric(
                       horizontal: 0,
-                      vertical: screenHeight * 0.025,
+                      vertical: screenWidth * 0.055,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(48),
                     ),
                     elevation: 4,
                     shadowColor: Colors.brown,
                   ),
                   child: SizedBox(
                     width: screenWidth * 0.45,
-                    height: screenHeight * 0.030,
+                    height: screenWidth * 0.055,
                     child: Center(
                       child: Padding(
                         padding: EdgeInsets.only(
