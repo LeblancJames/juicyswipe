@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:juicyswipe/how_to_play.dart';
+import 'package:just_audio/just_audio.dart';
 import 'game_screen.dart';
 import 'leaderboard_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:audioplayers/audioplayers.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,9 +19,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     music = AudioPlayer();
-    music.setReleaseMode(ReleaseMode.loop);
-    music.setSource(AssetSource('music.mp3'));
-    music.play(AssetSource('music.mp3'));
+    music.setLoopMode(LoopMode.all);
+    music.setAudioSource(
+      AudioSource.uri(Uri.parse('asset:///assets/music.mp3')),
+    );
+    music.play();
   }
 
   @override

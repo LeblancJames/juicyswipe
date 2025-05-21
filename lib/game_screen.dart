@@ -1,12 +1,12 @@
 import 'dart:math';
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:juicyswipe/game_over_screen.dart';
 import 'package:juicyswipe/models/fruit.dart';
 import 'package:juicyswipe/widgets/heart_capsule.dart';
+import 'package:just_audio/just_audio.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -57,9 +57,28 @@ class _GameScreenState extends State<GameScreen> {
     return (index % length + length) % length;
   }
 
+  //sound
+  final AudioPlayer sfxPlayerPop = AudioPlayer();
+  final AudioPlayer sfxPlayerThud = AudioPlayer();
+
+  final AudioPlayer music = AudioPlayer();
+
   @override
   void initState() {
     super.initState();
+
+    music.setLoopMode(LoopMode.all);
+    music.setAudioSource(
+      AudioSource.uri(Uri.parse('asset:///assets/music.mp3')),
+    );
+    music.setVolume(0.2);
+    music.play();
+    sfxPlayerPop.setAudioSource(
+      AudioSource.uri(Uri.parse('asset:///assets/pop.mp3')),
+    );
+    sfxPlayerThud.setAudioSource(
+      AudioSource.uri(Uri.parse('asset:///assets/thud.mp3')),
+    );
     resetGame();
   }
 
@@ -112,17 +131,22 @@ class _GameScreenState extends State<GameScreen> {
     baseBaskets[getWrappedIndex(currentCenterIndex + 1)],
   ];
 
-  void handleFruitLanding(FallingFruit fruit) {
+  void handleFruitLanding(FallingFruit fruit) async {
     int columnIndex = columnPositions.indexOf(fruit.xPosition);
     String basketColor = visibleBaskets[columnIndex].replaceAll('Basket', '');
 
     if (fruit.color == basketColor) {
+      await sfxPlayerPop.seek(Duration.zero);
+      sfxPlayerPop.play();
       // Correct catch
       setState(() {
         fruit.isCaught = true;
         score += 1;
       });
     } else {
+      await sfxPlayerThud.seek(Duration.zero);
+      sfxPlayerThud.play();
+
       // Missed or wrong basket
       setState(() {
         lives -= 1;
@@ -143,6 +167,9 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     fruitSpawner.cancel();
+    music.dispose();
+    sfxPlayerPop.dispose();
+    sfxPlayerThud.dispose();
     super.dispose();
   }
 
@@ -181,9 +208,6 @@ class _GameScreenState extends State<GameScreen> {
 
   final double collisionHeight = 0.75;
   bool hasNavigatedToGameOver = false;
-
-  //sound
-  final AudioPlayer sfxPlayer = AudioPlayer();
 
   @override
   Widget build(BuildContext context) {
