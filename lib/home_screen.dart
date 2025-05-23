@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:juicyswipe/how_to_play.dart';
+import 'package:juicyswipe/widgets/sound_settings.dart';
 import 'package:just_audio/just_audio.dart';
 import 'game_screen.dart';
 import 'leaderboard_screen.dart';
@@ -190,7 +191,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Settings
                   GestureDetector(
                     onTap: () {
-                      //TODO: Implement settings functionality
+                      showDialog(
+                        context: context,
+                        builder: (context) => const CenteredSettingsDialog(),
+                      );
                     },
                     child: Container(
                       width: screenWidth * 0.15,
