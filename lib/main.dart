@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:juicyswipe/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const FruitCatchApp());
+void main() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final double? musicVolume = prefs.getDouble('musicVolume');
+  final double? sfxVolume = prefs.getDouble('sfxVolume');
+  runApp(
+    FruitCatchApp(musicVolume: musicVolume ?? 0.5, sfxVolume: sfxVolume ?? 0.5),
+  );
 }
 
 class FruitCatchApp extends StatelessWidget {
-  const FruitCatchApp({super.key});
+  final double musicVolume;
+  final double sfxVolume;
+  const FruitCatchApp({
+    super.key,
+    required this.musicVolume,
+    required this.sfxVolume,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +26,7 @@ class FruitCatchApp extends StatelessWidget {
       title: 'Fruit Catcher',
       theme: ThemeData(fontFamily: 'ComicSans', useMaterial3: true),
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+      home: HomeScreen(musicVolume: musicVolume, sfxVolume: sfxVolume),
     );
   }
 }

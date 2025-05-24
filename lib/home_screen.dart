@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:juicyswipe/how_to_play.dart';
 import 'package:juicyswipe/widgets/sound_settings.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'game_screen.dart';
 import 'leaderboard_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final double musicVolume;
+  final double sfxVolume;
+  const HomeScreen({
+    super.key,
+    required this.musicVolume,
+    required this.sfxVolume,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -15,15 +22,19 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late AudioPlayer music;
-
+  late double musicVolumeHome;
+  late double sfxVolumeHome;
   @override
   void initState() {
     super.initState();
+    musicVolumeHome = widget.musicVolume;
+    sfxVolumeHome = widget.sfxVolume;
     music = AudioPlayer();
     music.setLoopMode(LoopMode.all);
     music.setAudioSource(
       AudioSource.uri(Uri.parse('asset:///assets/music.mp3')),
     );
+    music.setVolume(musicVolumeHome);
     music.play();
   }
 
@@ -74,10 +85,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(height: screenHeight * 0.05),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const GameScreen(),
+                        builder:
+                            (context) => GameScreen(
+                              musicVolume: musicVolumeHome,
+                              sfxVolume: sfxVolumeHome,
+                            ),
                       ),
                     );
                   },
@@ -126,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(height: screenHeight * 0.05),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const LeaderboardScreen(),
@@ -193,7 +208,31 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (context) => const CenteredSettingsDialog(),
+                        builder:
+                            (context) => CenteredSettingsDialog(
+                              musicVolume: musicVolumeHome,
+                              sfxVolume: sfxVolumeHome,
+                              onVolumeChanged: (
+                                newMusicVolume,
+                                newSfxVolume,
+                              ) async {
+                                setState(() {
+                                  musicVolumeHome = newMusicVolume;
+                                  sfxVolumeHome = newSfxVolume;
+                                  music.setVolume(musicVolumeHome);
+                                });
+                                final SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setDouble(
+                                  'musicVolume',
+                                  musicVolumeHome,
+                                );
+                                await prefs.setDouble(
+                                  'sfxVolume',
+                                  sfxVolumeHome,
+                                );
+                              },
+                            ),
                       );
                     },
                     child: Container(
@@ -220,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Help
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const HowToPlayScreen(),

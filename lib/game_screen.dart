@@ -9,7 +9,14 @@ import 'package:juicyswipe/widgets/heart_capsule.dart';
 import 'package:just_audio/just_audio.dart';
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key});
+  final double musicVolume;
+
+  final double sfxVolume;
+  const GameScreen({
+    super.key,
+    required this.musicVolume,
+    required this.sfxVolume,
+  });
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -66,13 +73,15 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.musicVolume != 0) {
+      music.setLoopMode(LoopMode.all);
+      music.setAudioSource(
+        AudioSource.uri(Uri.parse('asset:///assets/music.mp3')),
+      );
+      music.setVolume(widget.musicVolume);
+      music.play();
+    }
 
-    music.setLoopMode(LoopMode.all);
-    music.setAudioSource(
-      AudioSource.uri(Uri.parse('asset:///assets/music.mp3')),
-    );
-    music.setVolume(0.2);
-    music.play();
     sfxPlayerPop.setAudioSource(
       AudioSource.uri(Uri.parse('asset:///assets/pop.mp3')),
     );
@@ -136,16 +145,22 @@ class _GameScreenState extends State<GameScreen> {
     String basketColor = visibleBaskets[columnIndex].replaceAll('Basket', '');
 
     if (fruit.color == basketColor) {
-      await sfxPlayerPop.seek(Duration.zero);
-      sfxPlayerPop.play();
+      if (widget.sfxVolume != 0) {
+        await sfxPlayerPop.seek(Duration.zero);
+        sfxPlayerPop.setVolume(widget.sfxVolume);
+        sfxPlayerPop.play();
+      }
       // Correct catch
       setState(() {
         fruit.isCaught = true;
         score += 1;
       });
     } else {
-      await sfxPlayerThud.seek(Duration.zero);
-      sfxPlayerThud.play();
+      if (widget.sfxVolume != 0) {
+        await sfxPlayerThud.seek(Duration.zero);
+        await sfxPlayerThud.setVolume(widget.sfxVolume);
+        sfxPlayerThud.play();
+      }
 
       // Missed or wrong basket
       setState(() {
@@ -216,7 +231,14 @@ class _GameScreenState extends State<GameScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => GameOverScreen(score: score)),
+          MaterialPageRoute(
+            builder:
+                (_) => GameOverScreen(
+                  score: score,
+                  musicVolume: widget.musicVolume,
+                  sfxVolume: widget.sfxVolume,
+                ),
+          ),
         );
       });
     }

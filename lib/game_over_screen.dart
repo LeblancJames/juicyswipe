@@ -5,8 +5,15 @@ import 'package:juicyswipe/home_screen.dart';
 
 class GameOverScreen extends StatelessWidget {
   final int score;
+  final double musicVolume;
+  final double sfxVolume;
 
-  const GameOverScreen({super.key, required this.score});
+  const GameOverScreen({
+    super.key,
+    required this.score,
+    required this.musicVolume,
+    required this.sfxVolume,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +66,13 @@ class GameOverScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => GameScreen()),
+                      MaterialPageRoute(
+                        builder:
+                            (_) => GameScreen(
+                              musicVolume: musicVolume,
+                              sfxVolume: sfxVolume,
+                            ),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -109,7 +122,13 @@ class GameOverScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => HomeScreen()),
+                      MaterialPageRoute(
+                        builder:
+                            (_) => HomeScreen(
+                              musicVolume: musicVolume,
+                              sfxVolume: sfxVolume,
+                            ),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(

@@ -1,15 +1,31 @@
 import 'package:flutter/material.dart';
 
 class CenteredSettingsDialog extends StatefulWidget {
-  const CenteredSettingsDialog({super.key});
+  final double musicVolume;
+  final double sfxVolume;
+  final void Function(double, double) onVolumeChanged;
+
+  const CenteredSettingsDialog({
+    super.key,
+    required this.musicVolume,
+    required this.sfxVolume,
+    required this.onVolumeChanged,
+  });
 
   @override
   State<CenteredSettingsDialog> createState() => _CenteredSettingsDialogState();
 }
 
 class _CenteredSettingsDialogState extends State<CenteredSettingsDialog> {
-  double musicVolume = 0.5;
-  double sfxVolume = 0.5;
+  late double musicVolume;
+  late double sfxVolume;
+
+  @override
+  void initState() {
+    super.initState();
+    musicVolume = widget.musicVolume;
+    sfxVolume = widget.sfxVolume;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +60,6 @@ class _CenteredSettingsDialogState extends State<CenteredSettingsDialog> {
               value: musicVolume,
               onChanged: (value) {
                 setState(() => musicVolume = value);
-                // TODO: update music player volume
-                // music.setVolume(musicVolume);
               },
               thumbColor: Colors.brown,
               activeColor: Colors.brown,
@@ -58,8 +72,6 @@ class _CenteredSettingsDialogState extends State<CenteredSettingsDialog> {
               value: sfxVolume,
               onChanged: (value) {
                 setState(() => sfxVolume = value);
-                // TODO: update sfx player volume
-                // sfxPlayer.setVolume(sfxVolume);
               },
               thumbColor: Colors.brown,
               activeColor: Colors.brown,
@@ -68,7 +80,11 @@ class _CenteredSettingsDialogState extends State<CenteredSettingsDialog> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                widget.onVolumeChanged(musicVolume, sfxVolume);
+                Navigator.of(context).pop();
+              },
+
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
