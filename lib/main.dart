@@ -3,12 +3,11 @@ import 'package:juicyswipe/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  final double? musicVolume = prefs.getDouble('musicVolume');
-  final double? sfxVolume = prefs.getDouble('sfxVolume');
-  runApp(
-    FruitCatchApp(musicVolume: musicVolume ?? 0.5, sfxVolume: sfxVolume ?? 0.5),
-  );
+  final double musicVolume = prefs.getDouble('musicVolume') ?? 0.05;
+  final double sfxVolume = prefs.getDouble('sfxVolume') ?? 0.5;
+  runApp(FruitCatchApp(musicVolume: musicVolume, sfxVolume: sfxVolume));
 }
 
 class FruitCatchApp extends StatelessWidget {

@@ -67,11 +67,14 @@ flutter:
     - assets/redBasket.png
     - assets/greenBasket.png
     - assets/yellowBasket.png
+    - assets/blackBasket.png
     - assets/bomb.png
     - assets/music.mp3
     - assets/pop.mp3
     - assets/thud.mp3
     - assets/splash.mp3
+    - assets/fall.mp3
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

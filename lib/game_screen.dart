@@ -37,7 +37,7 @@ class _GameScreenState extends State<GameScreen> {
   final List<String> baseBaskets = [
     'blueBasket',
     'redBasket',
-    'empty',
+    'blackBasket', //bomb basket
     'greenBasket',
     'yellowBasket',
   ];
@@ -46,15 +46,19 @@ class _GameScreenState extends State<GameScreen> {
     'banana',
     'watermelon',
     'blueberry',
+    'bomb',
   ]; // image names in assets
   final Map<String, String> fruitColorMap = {
     'apple': 'red',
     'banana': 'yellow',
     'watermelon': 'green',
     'blueberry': 'blue',
+    'bomb': 'black',
   };
 
   final double fruitSize = 60.0;
+
+  final double baseFallSpeed = 0.005; // Base speed of falling fruits
 
   int currentCenterIndex = 0;
 
@@ -67,6 +71,7 @@ class _GameScreenState extends State<GameScreen> {
   //sound
   final AudioPlayer sfxPlayerPop = AudioPlayer();
   final AudioPlayer sfxPlayerThud = AudioPlayer();
+  final AudioPlayer sfxPlayerFall = AudioPlayer();
 
   final AudioPlayer music = AudioPlayer();
 
@@ -88,49 +93,76 @@ class _GameScreenState extends State<GameScreen> {
     sfxPlayerThud.setAudioSource(
       AudioSource.uri(Uri.parse('asset:///assets/thud.mp3')),
     );
+    sfxPlayerFall.setAudioSource(
+      AudioSource.uri(Uri.parse('asset:///assets/fall.mp3')),
+    );
     resetGame();
   }
 
+  DateTime lastSpawnTime = DateTime.now();
+
   void startSpawningFruits() {
-    fruitSpawner = Timer.periodic(Duration(seconds: 2), (_) {
-      final fruitType =
-          fruitTypes[rng.nextInt(
-            fruitTypes.length,
-          )]; //pick a random fruit type from the list
+    fruitSpawner = Timer.periodic(Duration(milliseconds: 100), (_) {
+      int currentSpawnInterval = max(750, 2000 - score * 20);
 
-      final fruitColor = fruitColorMap[fruitType]!;
+      final now = DateTime.now();
+      // Check if enough time has passed since the last spawn
+      if (now.difference(lastSpawnTime).inMilliseconds >=
+          currentSpawnInterval) {
+        lastSpawnTime = now;
 
-      final newFruit = FallingFruit(
-        type: fruitType,
-        color: fruitColor,
+        final bool spawnBomb =
+            score >= 10 && rng.nextDouble() < 0.1; // 20% chance
 
-        xPosition:
-            columnPositions[rng.nextInt(
-              columnPositions.length,
-            )], //pcik a random column position
-        yPosition: 0,
-      );
+        final String fruitType =
+            spawnBomb ? 'bomb' : fruitTypes[rng.nextInt(fruitTypes.length - 1)];
+        final fruitColor = fruitColorMap[fruitType]!;
 
-      setState(() {
-        fruits.add(newFruit);
-      });
+        final newFruit = FallingFruit(
+          type: fruitType,
+          color: fruitColor,
+          xPosition: columnPositions[rng.nextInt(columnPositions.length)],
+          yPosition: 0,
+        );
 
-      animateFruit(newFruit);
+        setState(() {
+          fruits.add(newFruit);
+        });
+
+        animateFruit(newFruit);
+      }
     });
   }
 
   void animateFruit(FallingFruit fruit) async {
+    double fallSpeed = baseFallSpeed * (1 + (score * 0.03));
+    fallSpeed = fallSpeed.clamp(0.005, 0.02); // Limit the speed to a range
     while (fruit.yPosition < collisionHeight &&
         !fruit.isCaught &&
         !isGameOver) {
       await Future.delayed(Duration(milliseconds: 16));
       setState(() {
-        fruit.yPosition += 0.01;
+        fruit.yPosition += fallSpeed;
       });
     }
-
+    //once the fruit reaches the collision height,
+    //check if it was caught or missed
     if (!fruit.isCaught && !isGameOver) {
       handleFruitLanding(fruit);
+    }
+
+    if (fruit.shouldFallThrough && !isGameOver) {
+      while (fruit.yPosition < 1.2) {
+        await Future.delayed(Duration(milliseconds: 16));
+
+        // 1.2 = off bottom of screen
+        setState(() {
+          fruit.yPosition += fallSpeed;
+        });
+      }
+      setState(() {
+        fruits.removeWhere((f) => f.key == fruit.key);
+      });
     }
   }
 
@@ -144,7 +176,36 @@ class _GameScreenState extends State<GameScreen> {
     int columnIndex = columnPositions.indexOf(fruit.xPosition);
     String basketColor = visibleBaskets[columnIndex].replaceAll('Basket', '');
 
+    //bomb
+
+    //fruit touches empty/bomb basket
+    if (basketColor == 'black') {
+      if (fruit.type == 'bomb') {
+        setState(() {
+          fruit.shouldFallThrough = true;
+        });
+      } else {
+        setState(() {
+          lives -= 1;
+          fruit.shouldFallThrough = true;
+          if (lives <= 0) {
+            isGameOver = true;
+            fruitSpawner.cancel(); // stop spawning more
+          }
+        });
+      }
+      if (widget.sfxVolume != 0) {
+        await sfxPlayerFall.seek(Duration.zero);
+        sfxPlayerFall.setVolume(widget.sfxVolume);
+        sfxPlayerFall.play();
+      }
+
+      return;
+    }
+
+    // Check if the fruit matches the basket color
     if (fruit.color == basketColor) {
+      //if sound effects is on
       if (widget.sfxVolume != 0) {
         await sfxPlayerPop.seek(Duration.zero);
         sfxPlayerPop.setVolume(widget.sfxVolume);
@@ -171,12 +232,12 @@ class _GameScreenState extends State<GameScreen> {
           fruitSpawner.cancel(); // stop spawning more
         }
       });
-      Future.delayed(Duration(milliseconds: 300), () {
-        setState(() {
-          fruits.removeWhere((f) => f.key == fruit.key);
-        });
-      });
     }
+    Future.delayed(Duration(milliseconds: 300), () {
+      setState(() {
+        fruits.removeWhere((f) => f.key == fruit.key);
+      });
+    });
   }
 
   @override

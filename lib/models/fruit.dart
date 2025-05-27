@@ -8,6 +8,8 @@ class FallingFruit {
   final Key key;
   bool isCaught = false;
   bool isMissed = false;
+  bool shouldFallThrough = false;
+
   FallingFruit({
     required this.type,
     required this.color,

@@ -64,7 +64,7 @@ class _CenteredSettingsDialogState extends State<CenteredSettingsDialog> {
               thumbColor: Colors.brown,
               activeColor: Colors.brown,
               min: 0,
-              max: 1,
+              max: 0.1,
             ),
             const SizedBox(height: 12),
             Text('SFX Volume'),
