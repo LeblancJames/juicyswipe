@@ -69,11 +69,13 @@ flutter:
     - assets/yellowBasket.png
     - assets/blackBasket.png
     - assets/bomb.png
+    - assets/explosion.png
     - assets/music.mp3
     - assets/pop.mp3
     - assets/thud.mp3
     - assets/splash.mp3
     - assets/fall.mp3
+    - assets/explosion_sound.mp3
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

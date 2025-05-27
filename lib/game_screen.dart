@@ -72,6 +72,7 @@ class _GameScreenState extends State<GameScreen> {
   final AudioPlayer sfxPlayerPop = AudioPlayer();
   final AudioPlayer sfxPlayerThud = AudioPlayer();
   final AudioPlayer sfxPlayerFall = AudioPlayer();
+  final AudioPlayer sfxExplosion = AudioPlayer();
 
   final AudioPlayer music = AudioPlayer();
 
@@ -95,6 +96,9 @@ class _GameScreenState extends State<GameScreen> {
     );
     sfxPlayerFall.setAudioSource(
       AudioSource.uri(Uri.parse('asset:///assets/fall.mp3')),
+    );
+    sfxExplosion.setAudioSource(
+      AudioSource.uri(Uri.parse('asset:///assets/explosion_sound.mp3')),
     );
     resetGame();
   }
@@ -177,6 +181,34 @@ class _GameScreenState extends State<GameScreen> {
     String basketColor = visibleBaskets[columnIndex].replaceAll('Basket', '');
 
     //bomb
+    if (fruit.type == 'bomb' && basketColor != 'black') {
+      setState(() {
+        lives -= 1;
+        showExplosion = true;
+        if (lives <= 0) {
+          isGameOver = true;
+          fruitSpawner.cancel(); // stop spawning more
+        }
+      });
+      if (widget.sfxVolume != 0) {
+        await sfxExplosion.seek(Duration.zero);
+        sfxExplosion.setVolume(widget.sfxVolume);
+        sfxExplosion.play();
+      }
+      Future.delayed(Duration(milliseconds: 300), () {
+        setState(() {
+          fruits.removeWhere((f) => f.key == fruit.key);
+        });
+      });
+      // Hide the explosion after 1 second
+      Future.delayed(Duration(seconds: 1), () {
+        setState(() {
+          showExplosion = false;
+        });
+      });
+
+      return;
+    }
 
     //fruit touches empty/bomb basket
     if (basketColor == 'black') {
@@ -284,6 +316,7 @@ class _GameScreenState extends State<GameScreen> {
 
   final double collisionHeight = 0.75;
   bool hasNavigatedToGameOver = false;
+  bool showExplosion = false;
 
   @override
   Widget build(BuildContext context) {
@@ -439,6 +472,20 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ),
+            if (showExplosion)
+              AnimatedOpacity(
+                opacity: showExplosion ? 1.0 : 0.0,
+                duration: Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                child: Center(
+                  child: Image.asset(
+                    'assets/explosion.png',
+                    width: screenWidth * 0.9,
+                    height: screenWidth * 0.9,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
