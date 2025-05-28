@@ -47,6 +47,7 @@ class _GameScreenState extends State<GameScreen> {
     'watermelon',
     'blueberry',
     'bomb',
+    'life',
   ]; // image names in assets
   final Map<String, String> fruitColorMap = {
     'apple': 'red',
@@ -54,6 +55,7 @@ class _GameScreenState extends State<GameScreen> {
     'watermelon': 'green',
     'blueberry': 'blue',
     'bomb': 'black',
+    'life': 'pink',
   };
 
   final double fruitSize = 60.0;
@@ -73,6 +75,7 @@ class _GameScreenState extends State<GameScreen> {
   final AudioPlayer sfxPlayerThud = AudioPlayer();
   final AudioPlayer sfxPlayerFall = AudioPlayer();
   final AudioPlayer sfxExplosion = AudioPlayer();
+  final AudioPlayer sfxLife = AudioPlayer();
 
   final AudioPlayer music = AudioPlayer();
 
@@ -100,6 +103,9 @@ class _GameScreenState extends State<GameScreen> {
     sfxExplosion.setAudioSource(
       AudioSource.uri(Uri.parse('asset:///assets/explosion_sound.mp3')),
     );
+    sfxLife.setAudioSource(
+      AudioSource.uri(Uri.parse('asset:///assets/life.mp3')),
+    );
     resetGame();
   }
 
@@ -115,11 +121,23 @@ class _GameScreenState extends State<GameScreen> {
           currentSpawnInterval) {
         lastSpawnTime = now;
 
-        final bool spawnBomb =
-            score >= 10 && rng.nextDouble() < 0.1; // 20% chance
+        // Spawn a new fruit
+        //if score is less than 10, spawn only fruits
+        //roll 10% bomb 5% heart
+        final String fruitType;
+        if (score >= 10) {
+          final double roll = rng.nextDouble();
+          if (roll <= 0.1) {
+            fruitType = 'bomb';
+          } else if (roll <= 0.15) {
+            fruitType = 'life';
+          } else {
+            fruitType = fruitTypes[rng.nextInt(fruitTypes.length - 2)];
+          }
+        } else {
+          fruitType = fruitTypes[rng.nextInt(fruitTypes.length - 2)];
+        }
 
-        final String fruitType =
-            spawnBomb ? 'bomb' : fruitTypes[rng.nextInt(fruitTypes.length - 1)];
         final fruitColor = fruitColorMap[fruitType]!;
 
         final newFruit = FallingFruit(
@@ -180,6 +198,24 @@ class _GameScreenState extends State<GameScreen> {
     int columnIndex = columnPositions.indexOf(fruit.xPosition);
     String basketColor = visibleBaskets[columnIndex].replaceAll('Basket', '');
 
+    //extra life
+    if (fruit.type == 'life' && basketColor != 'black') {
+      setState(() {
+        lives += 1;
+        fruit.isCaught = true;
+      });
+      if (widget.sfxVolume != 0) {
+        await sfxLife.seek(Duration.zero);
+        sfxLife.setVolume(widget.sfxVolume);
+        sfxLife.play();
+      }
+      Future.delayed(Duration(milliseconds: 300), () {
+        setState(() {
+          fruits.removeWhere((f) => f.key == fruit.key);
+        });
+      });
+      return;
+    }
     //bomb
     if (fruit.type == 'bomb' && basketColor != 'black') {
       setState(() {
@@ -213,6 +249,11 @@ class _GameScreenState extends State<GameScreen> {
     //fruit touches empty/bomb basket
     if (basketColor == 'black') {
       if (fruit.type == 'bomb') {
+        setState(() {
+          fruit.shouldFallThrough = true;
+        });
+      } else if (fruit.type == 'life') {
+        // If it's a heart, it should fall through without losing a life
         setState(() {
           fruit.shouldFallThrough = true;
         });
