@@ -146,58 +146,58 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.05),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LeaderboardScreen(),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(
-                      228,
-                      244,
-                      161,
-                      89,
-                    ), // light orange
-                    foregroundColor: const Color.fromARGB(
-                      204,
-                      255,
-                      255,
-                      255,
-                    ), // text color
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 0,
-                      vertical: screenWidth * 0.055,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(48),
-                    ),
-                    elevation: 4,
-                    shadowColor: Colors.brown,
-                  ),
-                  child: SizedBox(
-                    width: screenWidth * 0.45,
-                    height: screenWidth * 0.055,
-                    child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          left: screenWidth * 0.05,
-                          right: screenWidth * 0.05,
-                        ),
-                        child: Text(
-                          'LEADERBOARD',
-                          style: TextStyle(
-                            fontFamily: 'LuckiestGuy',
-                            fontSize: screenWidth * 0.05,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     Navigator.pushReplacement(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => const LeaderboardScreen(),
+                //       ),
+                //     );
+                //   },
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: const Color.fromARGB(
+                //       228,
+                //       244,
+                //       161,
+                //       89,
+                //     ), // light orange
+                //     foregroundColor: const Color.fromARGB(
+                //       204,
+                //       255,
+                //       255,
+                //       255,
+                //     ), // text color
+                //     padding: EdgeInsets.symmetric(
+                //       horizontal: 0,
+                //       vertical: screenWidth * 0.055,
+                //     ),
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(48),
+                //     ),
+                //     elevation: 4,
+                //     shadowColor: Colors.brown,
+                //   ),
+                //   child: SizedBox(
+                //     width: screenWidth * 0.45,
+                //     height: screenWidth * 0.055,
+                //     child: Center(
+                //       child: Padding(
+                //         padding: EdgeInsets.only(
+                //           left: screenWidth * 0.05,
+                //           right: screenWidth * 0.05,
+                //         ),
+                //         child: Text(
+                //           'LEADERBOARD',
+                //           style: TextStyle(
+                //             fontFamily: 'LuckiestGuy',
+                //             fontSize: screenWidth * 0.05,
+                //           ),
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
