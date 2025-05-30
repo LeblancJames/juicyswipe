@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class HeartCapsule extends StatelessWidget {
   final int lives;
@@ -27,7 +26,8 @@ class HeartCapsule extends StatelessWidget {
             padding: const EdgeInsets.only(top: 6),
             child: Text(
               'x $lives',
-              style: GoogleFonts.luckiestGuy(
+              style: TextStyle(
+                fontFamily: 'LuckiestGuy',
                 fontSize: 24,
                 color: Colors.black,
                 height: 1.0,

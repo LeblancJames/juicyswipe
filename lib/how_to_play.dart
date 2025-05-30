@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class HowToPlayScreen extends StatelessWidget {
   const HowToPlayScreen({super.key});
@@ -30,7 +29,8 @@ class HowToPlayScreen extends StatelessWidget {
                 SizedBox(height: screenHeight * .12),
                 Text(
                   'HOW TO PLAY',
-                  style: GoogleFonts.luckiestGuy(
+                  style: TextStyle(
+                    fontFamily: 'LuckiestGuy',
                     fontSize: screenWidth * .12,
                     color: Colors.brown,
                     fontWeight: FontWeight.w400,
@@ -61,7 +61,8 @@ class HowToPlayScreen extends StatelessWidget {
                             SizedBox(width: screenWidth * .05),
                             Text(
                               'Swipe screen \nto move the\nbaskets',
-                              style: GoogleFonts.fredoka(
+                              style: TextStyle(
+                                fontFamily: 'Fredoka',
                                 fontWeight: FontWeight.w600,
                                 fontSize: screenWidth * .06,
                                 color: Colors.black,
@@ -88,7 +89,8 @@ class HowToPlayScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   'Catch the\nfruits with\nthe matching\ncolor basket',
-                                  style: GoogleFonts.fredoka(
+                                  style: TextStyle(
+                                    fontFamily: 'Fredoka',
                                     fontWeight: FontWeight.w600,
                                     fontSize: screenWidth * .06,
                                     color: Colors.black,
@@ -113,7 +115,8 @@ class HowToPlayScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   'Avoid the\nbombs, catch\nthe hearts!',
-                                  style: GoogleFonts.fredoka(
+                                  style: TextStyle(
+                                    fontFamily: 'Fredoka',
                                     fontWeight: FontWeight.w600,
                                     fontSize: screenWidth * .06,
                                     color: Colors.black,
@@ -139,7 +142,7 @@ class HowToPlayScreen extends StatelessWidget {
             left: screenWidth * .02,
             child: IconButton(
               icon: Icon(Icons.arrow_back, size: 32),
-              color: Colors.black, // or any color you prefer
+              color: Colors.black,
               onPressed: () {
                 Navigator.pop(context); // Goes back to previous screen
               },

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:juicyswipe/game_screen.dart';
 import 'package:juicyswipe/home_screen.dart';
 
@@ -38,7 +37,8 @@ class GameOverScreen extends StatelessWidget {
                 SizedBox(height: screenHeight * 0.15),
                 Text(
                   'GAME',
-                  style: GoogleFonts.luckiestGuy(
+                  style: TextStyle(
+                    fontFamily: 'LuckiestGuy',
                     fontSize: screenWidth * .26,
                     color: Colors.brown,
                     height: 1,
@@ -46,7 +46,8 @@ class GameOverScreen extends StatelessWidget {
                 ),
                 Text(
                   'OVER',
-                  style: GoogleFonts.luckiestGuy(
+                  style: TextStyle(
+                    fontFamily: 'LuckiestGuy',
                     fontSize: screenWidth * .26,
                     color: Colors.brown,
                     height: 1,
@@ -55,7 +56,8 @@ class GameOverScreen extends StatelessWidget {
                 SizedBox(height: screenHeight * 0.05),
                 Text(
                   'Your Score: $score',
-                  style: GoogleFonts.luckiestGuy(
+                  style: TextStyle(
+                    fontFamily: 'LuckiestGuy',
                     fontSize: screenWidth * .07,
                     color: Colors.brown,
                     height: 1,
@@ -109,7 +111,8 @@ class GameOverScreen extends StatelessWidget {
                         ),
                         child: Text(
                           'PLAY AGAIN',
-                          style: GoogleFonts.luckiestGuy(
+                          style: TextStyle(
+                            fontFamily: 'LuckiestGuy',
                             fontSize: screenWidth * 0.1,
                           ),
                         ),
@@ -159,7 +162,8 @@ class GameOverScreen extends StatelessWidget {
                     padding: EdgeInsets.only(top: screenWidth * 0.02),
                     child: Text(
                       'QUIT',
-                      style: GoogleFonts.luckiestGuy(
+                      style: TextStyle(
+                        fontFamily: 'LuckiestGuy',
                         fontSize: screenWidth * 0.1,
                       ),
                     ),

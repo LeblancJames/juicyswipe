@@ -1,4 +1,4 @@
-package com.example.juicyswipe
+package com.axoncode.juicyswipe
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,12 +1,11 @@
 import 'dart:math';
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:juicyswipe/game_over_screen.dart';
 import 'package:juicyswipe/models/fruit.dart';
 import 'package:juicyswipe/widgets/heart_capsule.dart';
-import 'package:just_audio/just_audio.dart';
 
 class GameScreen extends StatefulWidget {
   final double musicVolume;
@@ -76,36 +75,57 @@ class _GameScreenState extends State<GameScreen> {
   final AudioPlayer sfxPlayerFall = AudioPlayer();
   final AudioPlayer sfxExplosion = AudioPlayer();
   final AudioPlayer sfxLife = AudioPlayer();
-
   final AudioPlayer music = AudioPlayer();
 
+  final AudioContext sfxContext = AudioContext(
+    android: AudioContextAndroid(
+      contentType: AndroidContentType.music,
+      usageType: AndroidUsageType.media,
+      audioFocus: AndroidAudioFocus.none,
+      stayAwake: false,
+    ),
+    iOS: AudioContextIOS(
+      category: AVAudioSessionCategory.ambient,
+      options: {AVAudioSessionOptions.mixWithOthers},
+    ),
+  );
   @override
   void initState() {
     super.initState();
     if (widget.musicVolume != 0) {
-      music.setLoopMode(LoopMode.all);
-      music.setAudioSource(
-        AudioSource.uri(Uri.parse('asset:///assets/music.mp3')),
-      );
-      music.setVolume(widget.musicVolume);
-      music.play();
-    }
+      music.setAudioContext(sfxContext);
 
-    sfxPlayerPop.setAudioSource(
-      AudioSource.uri(Uri.parse('asset:///assets/pop.mp3')),
+      music.setReleaseMode(ReleaseMode.loop);
+      music.play((AssetSource('music.mp3')));
+      music.setVolume(widget.musicVolume);
+    }
+    final sfxPlayers = [
+      sfxPlayerPop,
+      sfxPlayerThud,
+      sfxPlayerFall,
+      sfxExplosion,
+      sfxLife,
+    ];
+
+    for (var player in sfxPlayers) {
+      player.setAudioContext(sfxContext);
+    }
+    sfxPlayerPop.setSource(AssetSource('pop.mp3'));
+    sfxPlayerThud.setSource(AssetSource('thud.mp3'));
+    sfxPlayerFall.setSource(AssetSource('fall.mp3'));
+    sfxExplosion.setSource(AssetSource('explosion_sound.mp3'));
+    sfxLife.setSource(AssetSource('life.mp3'));
+
+    sfxPlayerThud.setAudioContext(
+      AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        iOS: AudioContextIOS(
+          category: AVAudioSessionCategory.ambient,
+          options: {AVAudioSessionOptions.mixWithOthers},
+        ),
+      ),
     );
-    sfxPlayerThud.setAudioSource(
-      AudioSource.uri(Uri.parse('asset:///assets/thud.mp3')),
-    );
-    sfxPlayerFall.setAudioSource(
-      AudioSource.uri(Uri.parse('asset:///assets/fall.mp3')),
-    );
-    sfxExplosion.setAudioSource(
-      AudioSource.uri(Uri.parse('asset:///assets/explosion_sound.mp3')),
-    );
-    sfxLife.setAudioSource(
-      AudioSource.uri(Uri.parse('asset:///assets/life.mp3')),
-    );
+
     resetGame();
   }
 
@@ -205,9 +225,9 @@ class _GameScreenState extends State<GameScreen> {
         fruit.isCaught = true;
       });
       if (widget.sfxVolume != 0) {
-        await sfxLife.seek(Duration.zero);
+        sfxLife.seek(Duration.zero);
         sfxLife.setVolume(widget.sfxVolume);
-        sfxLife.play();
+        sfxLife.play((AssetSource('life.mp3')));
       }
       Future.delayed(Duration(milliseconds: 300), () {
         setState(() {
@@ -227,9 +247,9 @@ class _GameScreenState extends State<GameScreen> {
         }
       });
       if (widget.sfxVolume != 0) {
-        await sfxExplosion.seek(Duration.zero);
+        sfxExplosion.seek(Duration.zero);
         sfxExplosion.setVolume(widget.sfxVolume);
-        sfxExplosion.play();
+        sfxExplosion.play(AssetSource('explosion_sound.mp3'));
       }
       Future.delayed(Duration(milliseconds: 300), () {
         setState(() {
@@ -268,9 +288,9 @@ class _GameScreenState extends State<GameScreen> {
         });
       }
       if (widget.sfxVolume != 0) {
-        await sfxPlayerFall.seek(Duration.zero);
+        sfxPlayerFall.seek(Duration.zero);
         sfxPlayerFall.setVolume(widget.sfxVolume);
-        sfxPlayerFall.play();
+        sfxPlayerFall.play(AssetSource('fall.mp3'));
       }
 
       return;
@@ -280,9 +300,9 @@ class _GameScreenState extends State<GameScreen> {
     if (fruit.color == basketColor) {
       //if sound effects is on
       if (widget.sfxVolume != 0) {
-        await sfxPlayerPop.seek(Duration.zero);
+        sfxPlayerPop.seek(Duration.zero);
         sfxPlayerPop.setVolume(widget.sfxVolume);
-        sfxPlayerPop.play();
+        sfxPlayerPop.play((AssetSource('pop.mp3')));
       }
       // Correct catch
       setState(() {
@@ -291,9 +311,9 @@ class _GameScreenState extends State<GameScreen> {
       });
     } else {
       if (widget.sfxVolume != 0) {
-        await sfxPlayerThud.seek(Duration.zero);
-        await sfxPlayerThud.setVolume(widget.sfxVolume);
-        sfxPlayerThud.play();
+        sfxPlayerThud.seek(Duration.zero);
+        sfxPlayerThud.setVolume(widget.sfxVolume);
+        sfxPlayerThud.play((AssetSource('thud.mp3')));
       }
 
       // Missed or wrong basket
@@ -317,8 +337,19 @@ class _GameScreenState extends State<GameScreen> {
   void dispose() {
     fruitSpawner.cancel();
     music.dispose();
-    sfxPlayerPop.dispose();
-    sfxPlayerThud.dispose();
+
+    final sfxPlayers = [
+      sfxPlayerPop,
+      sfxPlayerThud,
+      sfxPlayerFall,
+      sfxExplosion,
+      sfxLife,
+    ];
+
+    for (var player in sfxPlayers) {
+      player.dispose();
+    }
+
     super.dispose();
   }
 
@@ -424,14 +455,16 @@ class _GameScreenState extends State<GameScreen> {
                 children: [
                   Text(
                     'Score: ',
-                    style: GoogleFonts.luckiestGuy(
+                    style: TextStyle(
+                      fontFamily: 'LuckiestGuy',
                       fontSize: screenWidth * 0.06,
                       color: Colors.black,
                     ),
                   ),
                   Text(
                     score.toString(),
-                    style: GoogleFonts.luckiestGuy(
+                    style: TextStyle(
+                      fontFamily: 'LuckiestGuy',
                       fontSize: screenWidth * 0.06,
                       color: Colors.black,
                     ),

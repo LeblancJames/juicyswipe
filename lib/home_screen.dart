@@ -1,11 +1,11 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:juicyswipe/how_to_play.dart';
 import 'package:juicyswipe/widgets/sound_settings.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'game_screen.dart';
 import 'leaderboard_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:games_services/games_services.dart';
 
 class HomeScreen extends StatefulWidget {
   final double musicVolume;
@@ -27,15 +27,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    // GamesServices.signIn();
+    playMusic();
+  }
+
+  void playMusic() async {
     musicVolumeHome = widget.musicVolume;
     sfxVolumeHome = widget.sfxVolume;
+
     music = AudioPlayer();
-    music.setLoopMode(LoopMode.all);
-    music.setAudioSource(
-      AudioSource.uri(Uri.parse('asset:///assets/music.mp3')),
-    );
-    music.setVolume(musicVolumeHome);
-    music.play();
+
+    await music.play((AssetSource('music.mp3')));
+    await music.setReleaseMode(ReleaseMode.loop);
+    await music.setVolume(musicVolumeHome);
   }
 
   @override
@@ -68,7 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(height: screenHeight * 0.15),
                 Text(
                   'JUICY',
-                  style: GoogleFonts.luckiestGuy(
+                  style: TextStyle(
+                    fontFamily: 'LuckiestGuy',
                     fontSize: screenWidth * .26,
                     color: Colors.brown,
                     height: 1,
@@ -76,7 +81,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Text(
                   'SWIPE',
-                  style: GoogleFonts.luckiestGuy(
+                  style: TextStyle(
+                    fontFamily: 'LuckiestGuy',
                     fontSize: screenWidth * .26,
                     color: Colors.brown,
                     height: 1,
@@ -130,7 +136,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: Text(
                           'PLAY',
-                          style: GoogleFonts.luckiestGuy(
+                          style: TextStyle(
+                            fontFamily: 'LuckiestGuy',
                             fontSize: screenWidth * 0.15,
                           ),
                         ),
@@ -182,7 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: Text(
                           'LEADERBOARD',
-                          style: GoogleFonts.luckiestGuy(
+                          style: TextStyle(
+                            fontFamily: 'LuckiestGuy',
                             fontSize: screenWidth * 0.05,
                           ),
                         ),
